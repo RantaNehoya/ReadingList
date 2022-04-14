@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "128080091741",
+    "project_id": "readinglist-8e745",
+    "storage_bucket": "readinglist-8e745.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:128080091741:android:68f727307535a2b8cdcbb4",
+        "android_client_info": {
+          "package_name": "com.nehoya.reading_list"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "128080091741-q458hmn9fg5dirknisesist51hdabu3v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOwFT8U2kGSeL9AS4unkFh5hSccpMaRs8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "128080091741-q458hmn9fg5dirknisesist51hdabu3v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
