@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:reading_list/widgets.dart';
 import 'package:reading_list/books.dart';
+import 'package:reading_list/utilities.dart';
 
 class ReadingList extends StatefulWidget {
   const ReadingList({Key? key}) : super(key: key);
@@ -14,11 +15,165 @@ class ReadingList extends StatefulWidget {
 
 class _ReadingListState extends State<ReadingList> {
 
+  //user input
+  final TextEditingController _image = TextEditingController();
+  final TextEditingController _author = TextEditingController();
+  final TextEditingController _published = TextEditingController();
+  final TextEditingController _title = TextEditingController();
+  final TextEditingController _genre = TextEditingController();
+  final TextEditingController _plot = TextEditingController();
+
+  final FocusNode _titleFocusNode = FocusNode();
+  final FocusNode _authorFocusNode = FocusNode();
+  final FocusNode _publishedFocusNode = FocusNode();
+  final FocusNode _genreFocusNode = FocusNode();
+  final FocusNode _plotFocusNode = FocusNode();
+
+  @override
+  void dispose(){ //dispose of focus nodes
+    _titleFocusNode.dispose();
+    _authorFocusNode.dispose();
+    _publishedFocusNode.dispose();
+    _genreFocusNode.dispose();
+    _plotFocusNode.dispose();
+    super.dispose();
+  }
+
   //reference firebase collection "books"
-  Stream<List<BookCard>> _read() => FirebaseFirestore.instance.collection("books")
-      .snapshots()
-      .map((snapshot) => //iterate over snapshot documents and convert to BookCard object
+  Stream<List<BookCard>> _read() => FirebaseFirestore.instance.collection("books").snapshots().map((snapshot) => //iterate over snapshot documents and convert to BookCard object
   snapshot.docs.map((doc) => BookCard.fromJson(doc.data())).toList());
+
+  _displayDialog({required BuildContext context, required List book, required int index}) async {
+    showDialog(
+        context: context,
+        builder: (context){
+          //TODO: POP ALERTDIALOG
+          return AlertDialog(
+            content: Text(
+              book[index].plot,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.grey,
+                fontStyle: FontStyle.italic,
+                fontSize: 18.0,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
+            actions: [
+              bookOptions(
+                ctx: context,
+                text: "Edit",
+                function: () async {
+                  Navigator.pop(context);
+
+                  late final String documentID;
+                  var querySnapshot = await FirebaseFirestore.instance
+                      .collection("books").get();
+                  for (int i = 0; i < querySnapshot.size; i++) {
+                    if (i == index) {
+                      documentID = querySnapshot.docs[i].id;
+                    }
+                  }
+
+                  final bookDoc = FirebaseFirestore.instance.collection("books").doc(documentID);
+
+                  bottomsheet(
+                    ctx: context,
+                    image: _image,
+                    author: _author,
+                    authorFocusNode: _authorFocusNode,
+                    genre: _genre,
+                    genreFocusNode: _genreFocusNode,
+                    plot: _plot,
+                    plotFocusNode: _plotFocusNode,
+                    published: _published,
+                    publishedFocusNode: _publishedFocusNode,
+                    title: _title,
+                    titleFocusNode: _titleFocusNode,
+
+                    function: () async {
+                      bookDoc.update({
+                        "published": _published.text = (_published.text.isEmpty) ? await FirebaseFirestore.instance.collection("books").doc(documentID).get().then((value) => value.data()!["published"]) : _published.text,
+                        "plot": _plot.text = (_plot.text.isEmpty) ? await FirebaseFirestore.instance.collection("books").doc(documentID).get().then((value) => value.data()!["plot"]) : _plot.text,
+
+                        "genre": _genre.text = (_genre.text.isEmpty) ? await FirebaseFirestore.instance.collection("books").doc(documentID).get().then((value) => value.data()!["genre"]) : _genre.text,
+
+                        "author": _author.text = (_author.text.isEmpty) ? await FirebaseFirestore.instance.collection("books").doc(documentID).get().then((value) => value.data()!["author"]) : _author.text,
+
+                        "title": _title.text = (_title.text.isEmpty) ? await FirebaseFirestore.instance.collection("books").doc(documentID).get().then((value) => value.data()!["title"]) : _title.text,
+
+                        "image": _image.text = (_image.text.isEmpty) ? "https://media-exp1.licdn.com/dms/image/C560BAQH13TDLlaBLbA/company-logo_200_200/0/1584544180342?e=2147483647&v=beta&t=WAU3JlVFWsSIiIRfQs7dzzzhWkjaT0UipgQ5P1opEVY" : _image.text,
+                      });
+
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              ),
+
+              bookOptions(
+                ctx: context,
+                text: "Remove",
+                function: () {
+                  showDialog(
+                    context: context,
+                    builder: (context){
+                      return AlertDialog(
+                        content: Text("Are you sure you want to delete this book from your list?\nThis action cannot be undone."),
+                        actions: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+
+                            children: <Widget>[
+                              TextButton(
+                                onPressed: () async {
+                                  late final String documentID;
+                                  var querySnapshot = await FirebaseFirestore.instance.collection("books").get();
+                                  for (int i=0; i < querySnapshot.size; i++){
+                                    if (i == index){
+                                      documentID = querySnapshot.docs[i].id;
+                                    }
+                                  }
+                                  final bookDoc = FirebaseFirestore.instance.collection("books").doc(documentID);
+                                  bookDoc.delete();
+                                  Navigator.pop(context);
+                                },
+                                child: Text("Yes"),
+                              ),
+
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text("No"),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    },);
+                },
+              ),
+
+              bookOptions(
+                ctx: context,
+                text: "Add to Favourites",
+                function: () {
+                  //TODO: FAVOURITES FUNCTION
+                },
+              ),
+              bookOptions(
+                ctx: context,
+                text: "Send to Completed",
+                function: () {
+                  //TODO: SEND TO FUNCTION
+                },
+              ),
+            ],
+          );
+        }
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,63 +201,10 @@ class _ReadingListState extends State<ReadingList> {
                       itemBuilder: (context, index){
                         return GestureDetector(
                           onTap: (){
-                            //TODO: ALERT DIALOG
-                            showModalBottomSheet(
+                            _displayDialog(
                               context: context,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(30.0),
-                                  topRight: Radius.circular(30.0),
-                                ),
-                              ),
-                              builder: (context){
-                                return Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: <Widget>[
-
-                                      Text(
-                                        _book[index].plot,
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          color: Colors.grey,
-                                          fontStyle: FontStyle.italic,
-                                          fontSize: 18.0,
-                                        ),
-                                      ),
-
-                                      bookOptions(
-                                        ctx: context,
-                                        text: "Edit",
-                                        function: (){
-                                          //TODO: EDIT FUNCTION
-                                        },
-                                      ),
-
-                                      bookOptions(
-                                        ctx: context,
-                                        text: "Remove",
-                                        function: (){
-                                          //TODO: REMOVE FUNCTION
-                                        },
-                                      ),bookOptions(
-                                        ctx: context,
-                                        text: "Add to Favourites",
-                                        function: (){
-                                          //TODO: FAVOURITES FUNCTION
-                                        },
-                                      ),bookOptions(
-                                        ctx: context,
-                                        text: "Send to Completed",
-                                        function: (){
-                                          //TODO: SEND TO FUNCTION
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
+                              book: _book,
+                              index: index,
                             );
                           },
 

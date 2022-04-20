@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:reading_list/reading_list.dart';
 import 'package:reading_list/settings.dart';
-import 'package:reading_list/widgets.dart';
-import 'package:reading_list/books.dart';
+
 import 'package:reading_list/completed_list.dart';
 import 'package:reading_list/favourites.dart';
+import 'package:reading_list/utilities.dart';
+import 'package:reading_list/books.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,24 +71,6 @@ class _Home extends State<Home> {
   final FocusNode _genreFocusNode = FocusNode();
   final FocusNode _plotFocusNode = FocusNode();
 
-  //upload to firebase
-  Future createBook (BookCard newBook) async {
-
-    //create new doc
-    return FirebaseFirestore.instance.collection("books")
-        .add({
-      "image" : newBook.image,
-      "title" : newBook.title,
-      "author" : newBook.author,
-      "published" : newBook.published,
-      "genre" : newBook.genre,
-      "plot" : newBook.plot,
-
-    })
-        .then((value) => print("BOOK ADDED"))
-        .catchError((error) => print("CAUGHT ERROR: $error"));
-  }
-
   @override
   void dispose(){ //dispose of focus nodes
     _titleFocusNode.dispose();
@@ -98,7 +80,6 @@ class _Home extends State<Home> {
     _plotFocusNode.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -110,102 +91,33 @@ class _Home extends State<Home> {
             Icons.add,
           ),
           onPressed: (){
-            showModalBottomSheet(
-              isScrollControlled: true,
-              context: context,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30.0),
-                  topRight: Radius.circular(30.0),
-                ),
-              ),
-              builder: (context){
-                return Padding(
-                  padding: const EdgeInsets.all(30.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
+            bottomsheet(
+              ctx: context,
+              image: _image,
+              author: _author,
+              authorFocusNode: _authorFocusNode,
+              genre: _genre,
+              genreFocusNode: _genreFocusNode,
+              plot: _plot,
+              plotFocusNode: _plotFocusNode,
+              published: _published,
+              publishedFocusNode: _publishedFocusNode,
+              title: _title,
+              titleFocusNode: _titleFocusNode,
 
-                      //TODO: VALIDATION
-                      Form(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: <Widget>[
-
-                              kUserInput(
-                                text: "Image Url",
-                                controller: _image,
-                                function: (_){
-                                  FocusScope.of(context).requestFocus(_titleFocusNode);
-                                },
-                              ),
-
-                              kUserInput(
-                                text: "Title",
-                                controller: _title,
-                                focusNode: _titleFocusNode,
-                                function: (_){
-                                  FocusScope.of(context).requestFocus(_authorFocusNode);
-                                },
-                              ),
-
-                              kUserInput(
-                                text: "Author",
-                                controller: _author,
-                                focusNode: _authorFocusNode,
-                                function: (_){
-                                  FocusScope.of(context).requestFocus(_publishedFocusNode);
-                                },
-                              ),
-
-                              kUserInput(
-                                text: "Publish Date",
-                                controller: _published,
-                                focusNode: _publishedFocusNode,
-                                function: (_){
-                                  FocusScope.of(context).requestFocus(_genreFocusNode);
-                                },
-                              ),kUserInput(
-                                text: "Genre",
-                                controller: _genre,
-                                focusNode: _genreFocusNode,
-                                function: (_){
-                                  FocusScope.of(context).requestFocus(_plotFocusNode);
-                                },
-                              ),kUserInput(
-                                text: "Plot",
-                                controller: _plot,
-                                focusNode: _plotFocusNode,
-                                function: null,
-                              ),
-
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      bookOptions(
-                        text: "Save",
-                        ctx: context,
-                        function: (){
-                          final _newBook = BookCard(
-                            published: _published.text,
-                            plot: _plot.text,
-                            genre: _genre.text,
-                            author: _author.text,
-                            title: _title.text,
-                            image: _image.text = (_image.text.isEmpty) ? "https://media-exp1.licdn.com/dms/image/C560BAQH13TDLlaBLbA/company-logo_200_200/0/1584544180342?e=2147483647&v=beta&t=WAU3JlVFWsSIiIRfQs7dzzzhWkjaT0UipgQ5P1opEVY" : _image.text,
-                          );
-
-                          createBook(_newBook);
-
-                          Navigator.pop(context);
-                        },
-                      ),
-
-                    ],
-                  ),
+              function: (){
+                final _newBook = BookCard(
+                  published: _published.text,
+                  plot: _plot.text,
+                  genre: _genre.text,
+                  author: _author.text,
+                  title: _title.text,
+                  image: _image.text = (_image.text.isEmpty) ? "https://media-exp1.licdn.com/dms/image/C560BAQH13TDLlaBLbA/company-logo_200_200/0/1584544180342?e=2147483647&v=beta&t=WAU3JlVFWsSIiIRfQs7dzzzhWkjaT0UipgQ5P1opEVY" : _image.text,
                 );
+
+                createBook(_newBook);
+
+                Navigator.pop(context);
               },
             );
           },

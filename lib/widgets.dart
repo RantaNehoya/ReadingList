@@ -3,21 +3,25 @@ import 'package:flutter/material.dart';
 Padding bookOptions ({required BuildContext ctx, required VoidCallback function, required String text}){
   return Padding(
     padding: const EdgeInsets.all(5.0),
-    child: OutlinedButton(
-      style: ButtonStyle(
-        foregroundColor: MaterialStateProperty.all(Colors.black,),
-        padding: MaterialStateProperty.all(
-          EdgeInsets.symmetric(vertical: MediaQuery.of(ctx).size.height * 0.015,
+    child: Center(
+      child: OutlinedButton(
+        style: ButtonStyle(
+          foregroundColor: MaterialStateProperty.all(Colors.black,),
+          padding: MaterialStateProperty.all(
+            EdgeInsets.symmetric(
+              vertical: MediaQuery.of(ctx).size.height * 0.015,
+              horizontal: 40.0,
+            ),
           ),
         ),
-      ),
 
-      onPressed: function,
+        onPressed: function,
 
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 13.0,
+        child: Text(
+          text,
+          style: const TextStyle(
+            fontSize: 13.0,
+          ),
         ),
       ),
     ),
