@@ -15,6 +15,9 @@ class ReadingList extends StatefulWidget {
 
 class _ReadingListState extends State<ReadingList> {
 
+  //collection reference
+  final collectionReference = FirebaseFirestore.instance.collection("books");
+
   //user input
   final TextEditingController _image = TextEditingController();
   final TextEditingController _author = TextEditingController();
@@ -40,11 +43,11 @@ class _ReadingListState extends State<ReadingList> {
   }
 
   //reference firebase collection "books"
-  Stream<List<BookCard>> _read() => FirebaseFirestore.instance.collection("books").snapshots().map((snapshot) => //iterate over snapshot documents and convert to BookCard object
+  Stream<List<BookCard>> _read() => collectionReference.snapshots().map((snapshot) => //iterate over snapshot documents and convert to BookCard object
   snapshot.docs.map((doc) => BookCard.fromJson(doc.data())).toList());
 
   _displayDialog({required BuildContext context, required List book, required int index}) async {
-    showDialog(
+    return showDialog(
         context: context,
         builder: (context){
           //TODO: POP ALERTDIALOG
@@ -60,22 +63,26 @@ class _ReadingListState extends State<ReadingList> {
               ),
             ),
             actions: [
-              bookOptions(
+              kBookOptions(
                 ctx: context,
                 text: "Edit",
                 function: () async {
-                  Navigator.pop(context);
 
-                  late final String documentID;
-                  var querySnapshot = await FirebaseFirestore.instance
-                      .collection("books").get();
-                  for (int i = 0; i < querySnapshot.size; i++) {
-                    if (i == index) {
-                      documentID = querySnapshot.docs[i].id;
-                    }
-                  }
+                  final documentID = await getDocumentID(index);
 
-                  final bookDoc = FirebaseFirestore.instance.collection("books").doc(documentID);
+                  final bookDoc = collectionReference.doc(documentID);
+
+                  _published.text = await collectionReference.doc(documentID).get().then((value) => value.data()!["published"]);
+
+                  _plot.text = await collectionReference.doc(documentID).get().then((value) => value.data()!["plot"]);
+
+                  _genre.text = await collectionReference.doc(documentID).get().then((value) => value.data()!["genre"]);
+
+                  _author.text = await collectionReference.doc(documentID).get().then((value) => value.data()!["author"]);
+
+                  _title.text = await collectionReference.doc(documentID).get().then((value) => value.data()!["title"]);
+
+                  _image.text = "https://media-exp1.licdn.com/dms/image/C560BAQH13TDLlaBLbA/company-logo_200_200/0/1584544180342?e=2147483647&v=beta&t=WAU3JlVFWsSIiIRfQs7dzzzhWkjaT0UipgQ5P1opEVY";
 
                   bottomsheet(
                     ctx: context,
@@ -91,27 +98,27 @@ class _ReadingListState extends State<ReadingList> {
                     title: _title,
                     titleFocusNode: _titleFocusNode,
 
-                    function: () async {
+                    function: () {
                       bookDoc.update({
-                        "published": _published.text = (_published.text.isEmpty) ? await FirebaseFirestore.instance.collection("books").doc(documentID).get().then((value) => value.data()!["published"]) : _published.text,
-                        "plot": _plot.text = (_plot.text.isEmpty) ? await FirebaseFirestore.instance.collection("books").doc(documentID).get().then((value) => value.data()!["plot"]) : _plot.text,
+                        "published": _published.text,
 
-                        "genre": _genre.text = (_genre.text.isEmpty) ? await FirebaseFirestore.instance.collection("books").doc(documentID).get().then((value) => value.data()!["genre"]) : _genre.text,
+                        "plot": _plot.text,
 
-                        "author": _author.text = (_author.text.isEmpty) ? await FirebaseFirestore.instance.collection("books").doc(documentID).get().then((value) => value.data()!["author"]) : _author.text,
+                        "genre": _genre.text,
 
-                        "title": _title.text = (_title.text.isEmpty) ? await FirebaseFirestore.instance.collection("books").doc(documentID).get().then((value) => value.data()!["title"]) : _title.text,
+                        "author": _author.text,
+
+                        "title": _title.text,
 
                         "image": _image.text = (_image.text.isEmpty) ? "https://media-exp1.licdn.com/dms/image/C560BAQH13TDLlaBLbA/company-logo_200_200/0/1584544180342?e=2147483647&v=beta&t=WAU3JlVFWsSIiIRfQs7dzzzhWkjaT0UipgQ5P1opEVY" : _image.text,
                       });
-
                       Navigator.pop(context);
                     },
                   );
                 },
               ),
 
-              bookOptions(
+              kBookOptions(
                 ctx: context,
                 text: "Remove",
                 function: () {
@@ -119,7 +126,7 @@ class _ReadingListState extends State<ReadingList> {
                     context: context,
                     builder: (context){
                       return AlertDialog(
-                        content: Text("Are you sure you want to delete this book from your list?\nThis action cannot be undone."),
+                        content: const Text("Are you sure you want to delete this book from your list?\nThis action cannot be undone."),
                         actions: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -127,42 +134,38 @@ class _ReadingListState extends State<ReadingList> {
                             children: <Widget>[
                               TextButton(
                                 onPressed: () async {
-                                  late final String documentID;
-                                  var querySnapshot = await FirebaseFirestore.instance.collection("books").get();
-                                  for (int i=0; i < querySnapshot.size; i++){
-                                    if (i == index){
-                                      documentID = querySnapshot.docs[i].id;
-                                    }
-                                  }
-                                  final bookDoc = FirebaseFirestore.instance.collection("books").doc(documentID);
+                                  final documentID = await getDocumentID(index);
+                                  final bookDoc = collectionReference.doc(documentID);
+
                                   bookDoc.delete();
                                   Navigator.pop(context);
                                 },
-                                child: Text("Yes"),
+                                child: const Text("Yes"),
                               ),
 
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
-                                child: Text("No"),
+                                child: const Text("No"),
                               ),
                             ],
                           ),
                         ],
                       );
-                    },);
+                    },
+                  );
                 },
               ),
 
-              bookOptions(
+              kBookOptions(
                 ctx: context,
                 text: "Add to Favourites",
                 function: () {
                   //TODO: FAVOURITES FUNCTION
                 },
               ),
-              bookOptions(
+              kBookOptions(
                 ctx: context,
                 text: "Send to Completed",
                 function: () {
@@ -200,7 +203,7 @@ class _ReadingListState extends State<ReadingList> {
 
                       itemBuilder: (context, index){
                         return GestureDetector(
-                          onTap: (){
+                          onTap: () {
                             _displayDialog(
                               context: context,
                               book: _book,

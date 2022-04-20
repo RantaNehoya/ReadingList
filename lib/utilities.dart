@@ -23,7 +23,18 @@ Future createBook (BookCard newBook) async {
       .catchError((error) => print("CAUGHT ERROR: $error"));
 }
 
-//update firebase
+Future<String> getDocumentID (int index) async {
+  late final String documentID;
+  var querySnapshot = await FirebaseFirestore.instance
+      .collection("books").get();
+  for (int i = 0; i < querySnapshot.size; i++) {
+    if (i == index) {
+      documentID = querySnapshot.docs[i].id;
+    }
+  }
+  return documentID;
+}
+
 
 Future bottomsheet ({required BuildContext ctx, required TextEditingController image, required TextEditingController author, required TextEditingController published, required TextEditingController title, required TextEditingController genre, required TextEditingController plot, required FocusNode titleFocusNode, required FocusNode authorFocusNode, required FocusNode publishedFocusNode, required FocusNode genreFocusNode, required FocusNode plotFocusNode, required VoidCallback function}){
   return showModalBottomSheet(
@@ -100,7 +111,7 @@ Future bottomsheet ({required BuildContext ctx, required TextEditingController i
               ),
             ),
 
-            bookOptions(
+            kBookOptions(
               text: "Save",
               ctx: context,
               function: function,

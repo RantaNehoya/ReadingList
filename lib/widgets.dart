@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Padding bookOptions ({required BuildContext ctx, required VoidCallback function, required String text}){
+Padding kBookOptions ({required BuildContext ctx, required VoidCallback function, required String text}){
   return Padding(
     padding: const EdgeInsets.all(5.0),
     child: Center(
