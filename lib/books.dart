@@ -9,11 +9,18 @@ class BookCard extends StatelessWidget {
   final String genre;
   final String plot;
 
-  const BookCard(
-      {Key? key, required this.image, required this.title, required this.author, required this.published, required this.genre, required this.plot,
-      }) : super(key: key);
+  const BookCard({
+    Key? key,
 
-  static BookCard fromJson(Map<String, dynamic> json){
+    required this.image,
+    required this.title,
+    required this.author,
+    required this.published,
+    required this.genre,
+    required this.plot,
+  }) : super(key: key);
+
+  static BookCard fromJson(Map<String, dynamic> json){ //read from json objetct
     return BookCard(
       image: json["image"],
       title: json["title"],

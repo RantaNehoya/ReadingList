@@ -37,6 +37,7 @@ Future<String> getDocumentID (int index) async {
 
 
 Future bottomsheet ({required BuildContext ctx, required TextEditingController image, required TextEditingController author, required TextEditingController published, required TextEditingController title, required TextEditingController genre, required TextEditingController plot, required FocusNode titleFocusNode, required FocusNode authorFocusNode, required FocusNode publishedFocusNode, required FocusNode genreFocusNode, required FocusNode plotFocusNode, required VoidCallback function}){
+
   return showModalBottomSheet(
     isScrollControlled: true,
     context: ctx,
@@ -48,7 +49,12 @@ Future bottomsheet ({required BuildContext ctx, required TextEditingController i
     ),
     builder: (context){
       return Padding(
-        padding: const EdgeInsets.all(30.0),
+        padding: EdgeInsets.only(
+          top: MediaQuery.of(context).size.height * 0.05,
+          left: 30.0,
+          right: 30.0,
+          bottom: 30.0,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
