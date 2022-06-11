@@ -8,6 +8,7 @@ class BookCard extends StatelessWidget {
   final String published;
   final String genre;
   final String plot;
+  final String id;
 
   const BookCard({
     Key? key,
@@ -18,18 +19,20 @@ class BookCard extends StatelessWidget {
     required this.published,
     required this.genre,
     required this.plot,
+    required this.id,
   }) : super(key: key);
 
-  static BookCard fromJson(Map<String, dynamic> json){ //read from json objetct
-    return BookCard(
-      image: json["image"],
-      title: json["title"],
-      author: json["author"],
-      published: json["published"],
-      genre: json["genre"],
-      plot: json["plot"],
-    );
-  }
+  // static BookCard fromJson(Map<String, dynamic> json){ //read from json objetct
+  //   return BookCard(
+  //     image: json["image"],
+  //     title: json["title"],
+  //     author: json["author"],
+  //     published: json["published"],
+  //     genre: json["genre"],
+  //     plot: json["plot"],
+  //     id: json["id"],
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/widgets.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:provider/provider.dart';
 
 import 'package:reading_list/widgets.dart';
 import 'package:reading_list/books.dart';
 import 'package:reading_list/utilities.dart';
+import 'alertbox_actions.dart';
+import 'completed_books.dart';
 
 class ReadingList extends StatefulWidget {
   const ReadingList({Key? key}) : super(key: key);
@@ -16,8 +19,13 @@ class ReadingList extends StatefulWidget {
 
 class _ReadingListState extends State<ReadingList> {
 
+  //hud progress bool
+  bool _isLoading = false;
+
   //collection reference
-  final _collectionReference = FirebaseFirestore.instance.collection("books");
+  final _collectionReference = FirebaseFirestore.instance.collection('books');
+  final _favouritesCollectionReference = FirebaseFirestore.instance.collection('favourites');
+  // final _completedCollectionReference = FirebaseFirestore.instance.collection('completed');
 
   //user input
   final TextEditingController _image = TextEditingController();
@@ -43,54 +51,67 @@ class _ReadingListState extends State<ReadingList> {
     super.dispose();
   }
 
-  //reference firebase collection "books"
-  Stream<List<BookCard>> _read(){
-    return _collectionReference.snapshots().map((snapshot) => //iterate over snapshot documents and convert to BookCard object
-    snapshot.docs.map((doc) =>
-        BookCard.fromJson(doc.data())
-    ).toList()
-    );
-  }
-
-  // _displayDialog({required BuildContext context, required List book, required int index}) async {
-  //   return showDialog(
-  //       context: context,
-  //       builder: (context){
-  //         //TODO: POP ALERTDIALOG
-  //         return
-  //       }
-  //   );
-  // }
-
-  // void _read (){
-  //   _collectionReference.snapshots().map((book) => null)
-  // }
-
   @override
   Widget build(BuildContext context) {
+
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Reading List'),
+          centerTitle: true,
+        ),
 
         //read from firebase
-        body: StreamBuilder<List<BookCard>>(
-          stream: _read(),
-          builder: (context, snapshot){
+        body: StreamBuilder<QuerySnapshot>(
+          stream: _collectionReference.orderBy('title').snapshots(),
+          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot){
 
-            if (snapshot.connectionState == ConnectionState.waiting){
-              return const Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 3.0,
+            //error
+            if (snapshot.hasError){
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    CircularProgressIndicator(
+                      strokeWidth: 3.0,
+                    ),
+                    SizedBox(
+                      height: 15.0,
+                    ),
+
+                    Text(
+                      'There seems to be a problem',
+                      style: TextStyle(
+                        fontSize: 15.0,
+                        color: Colors.black54,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    )
+                  ],
                 ),
               );
             }
 
-            if (snapshot.hasError){
-              return const Center(
-                child: Text("Oh no! Something went wrong..."),
-              );
+            //empty list
+            if (!snapshot.hasData){
+              return const Text("Hmm... there seems to be nothing here");
             }
+
+            //filled list
             else{
-              final _book = snapshot.data!;
+              List<BookCard> _books = [];
+
+              for (var snpsht in snapshot.data!.docs){
+                _books.add(BookCard(
+                  id: snpsht.id,
+                  title: snpsht.get('title'),
+                  published: snpsht.get('published'),
+                  plot: snpsht.get('plot'),
+                  genre: snpsht.get('genre'),
+                  author: snpsht.get('author'),
+                  image: snpsht.get('image'),
+                ),);
+              }
 
               return Stack(
                 children: <Widget>[
@@ -108,33 +129,132 @@ class _ReadingListState extends State<ReadingList> {
                             showDialog(
                               context: context,
                               builder: (context){
-                                return DisplayDialog(
-                                  book: _book,
-                                  index: index,
-                                  collectionReference: _collectionReference,
+                                return AlertDialog(
+                                  title: Text(
+                                    _books[index].title,
+                                    textAlign: TextAlign.center,
+                                  ),
 
-                                  image: _image,
-                                  author: _author,
-                                  published: _published,
-                                  title: _title,
-                                  genre: _genre,
-                                  plot: _plot,
+                                  content: Text(
+                                    _books[index].plot,
+                                    textAlign: TextAlign.center,
 
-                                  titleFocusNode: _titleFocusNode,
-                                  authorFocusNode: _authorFocusNode,
-                                  publishedFocusNode: _publishedFocusNode,
-                                  genreFocusNode: _genreFocusNode,
-                                  plotFocusNode: _plotFocusNode,
+                                    style: const TextStyle(
+                                      color: Colors.grey,
+                                      fontStyle: FontStyle.italic,
+                                      fontSize: 13.5,
+                                      fontWeight: FontWeight.w300,
+                                    ),
+                                  ),
+
+                                  actions: [
+                                    //remove books
+                                    RemoveBook(
+                                      snapshot: snapshot,
+                                      index: index,
+                                      bookList: _books,
+                                    ),
+
+                                    // TODO: add to favourites button
+                                    ModalProgressHUD(
+                                      inAsyncCall: _isLoading,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(5.0),
+
+                                        child: Center(
+                                          child: OutlinedButton(
+
+                                            child: const Text(
+                                              'Add to Favourites',
+                                              style: TextStyle(
+                                                fontSize: 13.0,
+                                              ),
+                                            ),
+
+                                            style: ButtonStyle(
+                                              foregroundColor: MaterialStateProperty.all(Colors.black),
+
+                                              padding: MaterialStateProperty.all(
+                                                EdgeInsets.symmetric(
+                                                  vertical: MediaQuery.of(context).size.height * 0.015,
+                                                  horizontal: 40.0,
+                                                ),
+                                              ),
+                                            ),
+
+                                            onPressed: () async {
+                                              setState((){
+                                                _isLoading = true;
+                                              });
+                                              //TODO: ADD TO FAVS FIREBASE
+                                              snapshot.data!.docs[index].reference.delete();
+                                              _books.removeAt(index);
+                                              setState((){
+                                                _isLoading = false;
+                                              });
+                                              //TODO: ADDED SNACKBAR
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    // TODO: SEND TO FUNCTION
+                                    ModalProgressHUD(
+                                      inAsyncCall: _isLoading,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(5.0),
+
+                                        child: Center(
+                                          child: OutlinedButton(
+
+                                            child: const Text(
+                                              'Send to Completed',
+                                              style: TextStyle(
+                                                fontSize: 13.0,
+                                              ),
+                                            ),
+
+                                            style: ButtonStyle(
+                                              foregroundColor: MaterialStateProperty.all(Colors.black),
+
+                                              padding: MaterialStateProperty.all(
+                                                EdgeInsets.symmetric(
+                                                  vertical: MediaQuery.of(context).size.height * 0.015,
+                                                  horizontal: 40.0,
+                                                ),
+                                              ),
+                                            ),
+
+                                            onPressed: () async {
+                                              setState((){
+                                                _isLoading = true;
+                                              });
+                                              //TODO: ADD TO COMPLETED FIREBASE
+                                              snapshot.data!.docs[index].reference.delete();
+                                              _books.removeAt(index);
+                                              setState((){
+                                                _isLoading = false;
+                                              });
+                                              //TODO: SENT SNACKBAR
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    //TODO: SIZEDBOX
+                                  ],
                                 );
                               },
                             );
                           },
 
-                          child: _book[index],
+                          child: _books[index],
                         );
                       },
 
-                      itemCount: _book.length,
+                      itemCount: _books.length,
                     ),
                   ),
                 ],
@@ -143,196 +263,6 @@ class _ReadingListState extends State<ReadingList> {
           },
         ),
       ),
-    );
-  }
-}
-
-class DisplayDialog extends StatelessWidget {
-
-  final List book;
-  final int index;
-  final CollectionReference collectionReference;
-
-  //user input
-  final TextEditingController image;
-  final TextEditingController author;
-  final TextEditingController published;
-  final TextEditingController title;
-  final TextEditingController genre;
-  final TextEditingController plot;
-
-  final FocusNode titleFocusNode;
-  final FocusNode authorFocusNode;
-  final FocusNode publishedFocusNode;
-  final FocusNode genreFocusNode;
-  final FocusNode plotFocusNode;
-
-  const DisplayDialog({
-    Key? key,
-    required this.book,
-    required this.index,
-    required this.collectionReference,
-
-    required this.image,
-    required this.author,
-    required this.published,
-    required this.title,
-    required this.genre,
-    required this.plot,
-
-    required this.titleFocusNode,
-    required this.authorFocusNode,
-    required this.publishedFocusNode,
-    required this.genreFocusNode,
-    required this.plotFocusNode,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(
-        book[index].title,
-        textAlign: TextAlign.center,
-      ),
-      content: Text(
-        book[index].plot,
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          color: Colors.grey,
-          fontStyle: FontStyle.italic,
-          fontSize: 18.0,
-          fontWeight: FontWeight.w300,
-        ),
-      ),
-
-      actions: [
-
-        //todo: pop dialog
-        //edit/update books
-        kBookOptions(
-          ctx: context,
-          text: "Edit",
-          function: () async {
-
-            final documentID = await getDocumentID(index);
-            final bookDoc = collectionReference.doc(documentID);
-
-            published.text = await collectionReference.doc(documentID).get().then((value) => value['published']);
-            plot.text = await collectionReference.doc(documentID).get().then((value) => value['plot']);
-            genre.text = await collectionReference.doc(documentID).get().then((value) => value['genre']);
-            author.text = await collectionReference.doc(documentID).get().then((value) => value['author']);
-            title.text = await collectionReference.doc(documentID).get().then((value) => value['title']);
-            image.text = "https://media-exp1.licdn.com/dms/image/C560BAQH13TDLlaBLbA/company-logo_200_200/0/1584544180342?e=2147483647&v=beta&t=WAU3JlVFWsSIiIRfQs7dzzzhWkjaT0UipgQ5P1opEVY";
-
-            bottomsheet(
-              ctx: context,
-              image: image,
-              author: author,
-              authorFocusNode: authorFocusNode,
-              genre: genre,
-              genreFocusNode: genreFocusNode,
-              plot: plot,
-              plotFocusNode: plotFocusNode,
-              published: published,
-              publishedFocusNode: publishedFocusNode,
-              title: title,
-              titleFocusNode: titleFocusNode,
-
-              function: () {
-                bookDoc.update({
-                  'published': published.text,
-
-                  'plot': plot.text,
-
-                  'genre': genre.text,
-
-                  'author': author.text,
-
-                  'title': title.text,
-
-                  'image': image.text = (image.text.isEmpty) ? "https://media-exp1.licdn.com/dms/image/C560BAQH13TDLlaBLbA/company-logo_200_200/0/1584544180342?e=2147483647&v=beta&t=WAU3JlVFWsSIiIRfQs7dzzzhWkjaT0UipgQ5P1opEVY" : image.text,
-                });
-                Navigator.pop(context);
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Book successfully updated'),
-                    duration: Duration(seconds: 1),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-              },
-            );
-          },
-        ),
-
-        //remove books
-        kBookOptions(
-          ctx: context,
-          text: "Remove",
-
-          function: () {
-            Navigator.pop(context);
-            showDialog(
-              context: context,
-              builder: (context){
-                return AlertDialog(
-                  content: const Text(
-                    'Are you sure you want to delete this book from your list?\nThis action cannot be undone.',
-                    textAlign: TextAlign.center,
-                  ),
-
-                  actions: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-
-                      children: <Widget>[
-                        TextButton(
-                          onPressed: () async {
-                            final documentID = await getDocumentID(index);
-                            final bookDoc = collectionReference.doc(documentID);
-
-                            bookDoc.delete();
-                            Navigator.pop(context);
-                          },
-                          child: const Text('Yes'),
-                        ),
-
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text('No'),
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-        ),
-
-        //add to favourites button
-        kBookOptions(
-          ctx: context,
-          text: 'Add to Favourites',
-          function: () {
-            //TODO: FAVOURITES FUNCTION
-            //TODO: pop dialog
-          },
-        ),
-
-        //completed books
-        kBookOptions(
-          ctx: context,
-          text: 'Send to Completed',
-          function: () {
-            //TODO: SEND TO FUNCTION
-            //TODO: pop dialog
-          },
-        ),
-      ],
     );
   }
 }
