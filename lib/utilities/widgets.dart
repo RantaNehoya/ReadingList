@@ -1,5 +1,30 @@
 import 'package:flutter/material.dart';
 
+Center firebaseStreamHasErrorMessage (){
+  return Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: const [
+        CircularProgressIndicator(
+          strokeWidth: 3.0,
+        ),
+        SizedBox(
+          height: 15.0,
+        ),
+
+        Text(
+          'Fetching...',
+          style: TextStyle(
+            fontSize: 15.0,
+            color: Colors.black54,
+            fontStyle: FontStyle.italic,
+          ),
+        )
+      ],
+    ),
+  );
+}
+
 Padding bookOption ({required String action, required BuildContext ctx, required VoidCallback function}){
   return Padding(
     padding: const EdgeInsets.all(5.0),
@@ -28,18 +53,6 @@ Padding bookOption ({required String action, required BuildContext ctx, required
         onPressed: function,
       ),
     ),
-  );
-}
-
-TextFormField kUserInput ({required String text, required TextEditingController controller, required dynamic function, FocusNode? focusNode}){
-  return TextFormField(
-    decoration: InputDecoration(
-      labelText: text,
-    ),
-    textInputAction: TextInputAction.next,
-    controller: controller,
-    focusNode: focusNode,
-    onFieldSubmitted: function,
   );
 }
 

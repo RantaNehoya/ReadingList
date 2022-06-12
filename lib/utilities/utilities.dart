@@ -3,41 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
-import 'package:reading_list/widgets.dart';
-import 'package:reading_list/books.dart';
-
-//upload to firebase
-Future createBook (BookCard newBook) async {
-
-  //create new doc
-  return FirebaseFirestore.instance.collection('books')
-      .add({
-    'id': newBook.id,
-    'image': newBook.image,
-    'title': newBook.title,
-    'author': newBook.author,
-    'published': newBook.published,
-    'genre': newBook.genre,
-    'plot': newBook.plot,
-
-  })
-      .then((value) => print('BOOK ADDED'))
-      .catchError((error) => print('CAUGHT ERROR: $error'));
-}
-
-Future<String> getDocumentID (int index) async {
-  late final String documentID;
-  var querySnapshot = await FirebaseFirestore.instance
-      .collection("books").get();
-  for (int i = 0; i < querySnapshot.size; i++) {
-    if (i == index) {
-      documentID = querySnapshot.docs[i].id;
-    }
-  }
-  return documentID;
-}
-
-
 //dialog alert box
 class AlertBox extends StatelessWidget {
   final VoidCallback function;
@@ -83,7 +48,6 @@ class BottomsheetMenu extends StatefulWidget {
   @override
   State<BottomsheetMenu> createState() => _BottomsheetMenuState();
 }
-
 class _BottomsheetMenuState extends State<BottomsheetMenu> {
   DateTime _selectedDate = DateTime.now();
   bool _isDateSelected = false;
