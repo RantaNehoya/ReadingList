@@ -1,26 +1,35 @@
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
+
+import 'package:reading_list/app_theme.dart';
+
 Center firebaseStreamHasErrorMessage (){
   return Center(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: const [
-        CircularProgressIndicator(
-          strokeWidth: 3.0,
-        ),
-        SizedBox(
-          height: 15.0,
-        ),
+    child: Consumer<ThemeProvider>(
+      builder: (context, theme, _){
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(
+              strokeWidth: 3.0,
+            ),
 
-        Text(
-          'Fetching...',
-          style: TextStyle(
-            fontSize: 15.0,
-            color: Colors.black54,
-            fontStyle: FontStyle.italic,
-          ),
-        )
-      ],
+            const SizedBox(
+              height: 15.0,
+            ),
+
+            Text(
+              'Fetching...',
+              style: TextStyle(
+                fontSize: 15.0,
+                color: theme.isDark ? Colors.white54 : Colors.black54,
+                fontStyle: FontStyle.italic,
+              ),
+            )
+          ],
+        );
+      },
     ),
   );
 }
@@ -61,4 +70,65 @@ SnackBar floatingSnackBar (String msg){
     behavior: SnackBarBehavior.floating,
     content: Text(msg),
   );
+}
+
+Padding bookInputTextFormField ({required String label, required TextEditingController controller, FocusNode? focusNode, FocusNode? requestedFocusNode}){
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: TextFormField(
+      controller: controller,
+      focusNode: focusNode,
+
+      validator: (value){
+        if (value == null || value.isEmpty){
+          return 'Cannot leave field empty';
+        }
+        else {
+          return null;
+        }
+      },
+
+      onEditingComplete: (){
+        requestedFocusNode?.requestFocus();
+      },
+
+      decoration: InputDecoration(
+        label: Text(label),
+      ),
+    ),
+  );
+}
+
+Padding settingsPageOptions ({required IconData icon, required String label, required VoidCallback function}){
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: GestureDetector(
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(label),
+      ),
+
+      onTap: function,
+    ),
+  );
+}
+
+Divider settingsPageDivider (BuildContext ctx){
+  return Divider(
+    thickness: 1.0,
+    endIndent: MediaQuery.of(ctx).size.width * 0.03,
+    indent: MediaQuery.of(ctx).size.width * 0.03,
+  );
+}
+
+double bottomSheetHeight (BuildContext ctx){
+  return MediaQuery.of(ctx).size.height * 0.9;
+}
+
+double publicationDateWidth (BuildContext ctx){
+  return MediaQuery.of(ctx).size.width * 0.5;
+}
+
+double publicationDateHeight (BuildContext ctx){
+  return MediaQuery.of(ctx).size.width * 0.07;
 }

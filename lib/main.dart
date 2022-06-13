@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 
+import 'package:reading_list/app_theme.dart';
 import 'package:reading_list/models/page_navigation.dart';
 
 
@@ -17,14 +18,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'ReadingList',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.orange,
-        ),
+    return ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, theme, _){
+          return MaterialApp(
+              title: 'Reading List',
+              debugShowCheckedModeBanner: false,
+              theme: theme.isDark ? AppTheme.darkMode : AppTheme.lightMode,
 
-        home: const PageNavigation()
+              home: const PageNavigation()
+          );
+        },
+      ),
     );
   }
 }

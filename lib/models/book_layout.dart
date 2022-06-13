@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:intl/intl.dart';
+
 class BookCard extends StatelessWidget {
 
   final String image;
@@ -52,7 +54,7 @@ class BookCard extends StatelessWidget {
                   ),
 
                   Text(
-                    published,
+                    DateFormat.yMMMMd().format(DateTime.parse(published)).toString(),
                     style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 12.0,

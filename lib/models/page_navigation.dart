@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
+import 'package:provider/provider.dart';
 
 import 'package:reading_list/utilities/add_book.dart';
 import 'package:reading_list/screens/reading_list_screen.dart';
 import 'package:reading_list/screens/completed_books_screen.dart';
 import 'package:reading_list/screens/favourite_books_screen.dart';
 import 'package:reading_list/screens/settings_screen.dart';
+import 'package:reading_list/app_theme.dart';
 
 class PageNavigation extends StatefulWidget {
   const PageNavigation({Key? key}) : super(key: key);
@@ -36,46 +38,45 @@ class _PageNavigation extends State<PageNavigation> {
   Widget build(BuildContext context) {
 
     return SafeArea(
-      child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(
-            Icons.add,
-          ),
-          onPressed: (){
-
-            showModalBottomSheet(
-              context: context,
-              backgroundColor: Colors.orangeAccent,
-              isScrollControlled: true,
-
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(15.0),
-                  topRight: Radius.circular(15.0),
-                ),
+      child: Consumer<ThemeProvider>(
+        builder: (context, theme, _){
+          return Scaffold(
+            floatingActionButton: FloatingActionButton(
+              child: const Icon(
+                Icons.add,
               ),
+              onPressed: (){
 
-              builder: (context){
-                return AddBook();
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+
+                  builder: (context){
+                    return AddBook();
+                  },
+                );
               },
-            );
-          },
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+            ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
-        bottomNavigationBar: AnimatedBottomNavigationBar(
-          icons: const [
-            Icons.library_books_outlined,
-            Icons.checklist_rtl_outlined,
-            Icons.favorite_border_outlined,
-            Icons.settings_outlined,
-          ],
-          activeIndex: _index,
-          gapLocation: GapLocation.center,
-          onTap: _onTapped,
-        ),
+            bottomNavigationBar: AnimatedBottomNavigationBar(
+              icons: const [
+                Icons.library_books_outlined,
+                Icons.checklist_rtl_outlined,
+                Icons.favorite_border_outlined,
+                Icons.settings_outlined,
+              ],
+              activeIndex: _index,
+              gapLocation: GapLocation.center,
+              backgroundColor: theme.isDark ? AppTheme.darkMode.primaryColor : AppTheme.lightMode.primaryColor,
+              activeColor: theme.isDark ? Colors.white : Colors.black,
+              inactiveColor: theme.isDark ? Colors.white54 : Colors.black54,
+              onTap: _onTapped,
+            ),
 
-        body: _pages.elementAt(_index),
+            body: _pages.elementAt(_index),
+          );
+        },
       ),
     );
   }

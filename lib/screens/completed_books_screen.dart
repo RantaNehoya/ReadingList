@@ -24,7 +24,6 @@ class _CompletedListState extends State<CompletedList> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Completed'),
-          centerTitle: true,
         ),
 
         body: StreamBuilder<QuerySnapshot>(

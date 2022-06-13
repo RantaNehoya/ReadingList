@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
-import 'package:provider/provider.dart';
 
 import 'package:reading_list/models/book_layout.dart';
 import 'package:reading_list/utilities/alertbox_actions.dart';
@@ -30,7 +29,6 @@ class _ReadingListState extends State<ReadingList> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Reading List'),
-          centerTitle: true,
         ),
 
         //read from firebase
@@ -93,6 +91,12 @@ class _ReadingListState extends State<ReadingList> {
                             ),
 
                             actions: [
+                              //edit books
+                              // EditBook(
+                              //   snapshot: snapshot,
+                              //   index: index,
+                              // ),
+
                               //remove books
                               RemoveBook(
                                 snapshot: snapshot,

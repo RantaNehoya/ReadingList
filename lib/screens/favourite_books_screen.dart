@@ -24,7 +24,6 @@ class _FavouritesState extends State<Favourites> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Favorites'),
-          centerTitle: true,
         ),
 
         body: StreamBuilder<QuerySnapshot>(
@@ -38,7 +37,7 @@ class _FavouritesState extends State<Favourites> {
 
             else{
 
-              List<BookCard> _favBooks =[];
+              List<BookCard> _favBooks = [];
 
               for (var snpsht in snapshot.data!.docs){
                 _favBooks.add(
