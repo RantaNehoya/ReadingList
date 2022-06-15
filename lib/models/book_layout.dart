@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 
 import 'package:intl/intl.dart';
 
@@ -28,10 +29,12 @@ class BookCard extends StatelessWidget {
         children: <Widget>[
 
           Image(
-            image: NetworkImage(
-              image,
-            ),
-            fit: BoxFit.contain,
+            image: (image.isEmpty || image == null) ?
+            const AssetImage('assets/images/undefined.png')
+                : FileImage(File(image)) as ImageProvider,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height * 0.23,
           ),
 
           ...List.generate(

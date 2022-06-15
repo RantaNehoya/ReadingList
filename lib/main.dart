@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'package:reading_list/app_theme.dart';
 import 'package:reading_list/models/page_navigation.dart';
+import 'package:reading_list/screens/login_screen.dart';
 
 
 void main() async {
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
               debugShowCheckedModeBanner: false,
               theme: theme.isDark ? AppTheme.darkMode : AppTheme.lightMode,
 
-              home: const PageNavigation()
+              home: const LoginScreen()
           );
         },
       ),

@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart' as syspath;
+import 'package:path/path.dart' as path;
 
 import 'package:reading_list/app_theme.dart';
 import 'package:reading_list/utilities/widgets.dart';
@@ -14,6 +19,10 @@ class AddBook extends StatefulWidget {
 }
 
 class _AddBookState extends State<AddBook> {
+
+  //book image
+  File? _bookImage;
+  String _selectedImage = '';
 
   //collection reference
   final _collectionReference = FirebaseFirestore.instance.collection('books');
@@ -48,6 +57,22 @@ class _AddBookState extends State<AddBook> {
     }
   }
 
+  Future<String> _imageFromGallery () async {
+
+    final imageFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    setState((){
+      _bookImage = File(imageFile!.path);
+    });
+
+    final appDir = await syspath.getApplicationDocumentsDirectory();
+    final fileName = path.basename(imageFile!.path);
+    final savedImage = await (File(imageFile.path)).copy('${appDir.path}/$fileName');
+    print('+++++++++++++++++++++++++++++++++++++++++++++${savedImage.path}');
+
+    return savedImage.path;
+  }
+
   @override
   void dispose() {
     //dispose controllers
@@ -76,6 +101,32 @@ class _AddBookState extends State<AddBook> {
                 key: _formKey,
                 child: Column(
                   children: [
+
+                    //book image
+                    GestureDetector(
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        height: MediaQuery.of(context).size.height * 0.14,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: theme.isDark ? Colors.white54 : Colors.black54,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: _bookImage != null ?
+                        Image.file(
+                          _bookImage!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                        ) :
+                        const Text('Select Image'),
+                      ),
+
+                      //select image from gallery
+                      onTap: () async {
+                        _selectedImage = await _imageFromGallery();
+                      },
+                    ),
 
                     //title
                     bookInputTextFormField(
@@ -169,7 +220,7 @@ class _AddBookState extends State<AddBook> {
 
                             if(_formKey.currentState!.validate() && _isDateSelected){
                               _collectionReference.add({
-                                'image': '',
+                                'image': _selectedImage,
                                 'title': _title.text,
                                 'author': _author.text,
                                 'genre': _genre.text,

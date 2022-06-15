@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 import 'package:reading_list/models/book_layout.dart';
 import 'package:reading_list/utilities/alertbox_actions.dart';
