@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:reading_list/models/book_layout.dart';
 import 'package:reading_list/utilities/constants.dart';
@@ -18,7 +19,15 @@ class _CompletedListState extends State<CompletedList> {
   Widget build(BuildContext context) {
 
     //collection reference
-    final _completedCollectionReference = FirebaseFirestore.instance.collection('completed');
+    final _completedCollectionReference = FirebaseFirestore.instance.collection('users');
+
+    //firebase auth
+    final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+    //get user email
+    String _userEmail (){
+      return _firebaseAuth.currentUser!.email.toString();
+    }
 
     return SafeArea(
       child: Scaffold(
@@ -27,7 +36,7 @@ class _CompletedListState extends State<CompletedList> {
         ),
 
         body: StreamBuilder<QuerySnapshot>(
-          stream: _completedCollectionReference.orderBy('title').snapshots(),
+          stream: _completedCollectionReference.doc(_userEmail()).collection('completed').orderBy('title').snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
 
             //error

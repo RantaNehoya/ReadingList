@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:reading_list/app_theme.dart';
+import 'package:reading_list/utilities/widgets.dart';
 
-import '../utilities/widgets.dart';
+import 'login_screen.dart';
 
 class AppSettings extends StatefulWidget {
   const AppSettings({Key? key}) : super(key: key);
@@ -14,6 +16,10 @@ class AppSettings extends StatefulWidget {
 }
 
 class _AppSettingsState extends State<AppSettings> {
+
+  //firebase auth
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -47,7 +53,7 @@ class _AppSettingsState extends State<AppSettings> {
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: Text(
-                              'Email', //TODO: EMAIL
+                              _firebaseAuth.currentUser!.email.toString(),
                             ),
                           ),
                         ),
@@ -69,6 +75,7 @@ class _AppSettingsState extends State<AppSettings> {
                           icon: Icons.email_outlined,
                           function: (){
                             //TODO: CHANGE EMAIL
+                            _firebaseAuth.currentUser!.updateEmail('newEmail');
                           },
                         ),
 
@@ -77,7 +84,11 @@ class _AppSettingsState extends State<AppSettings> {
                           label: 'Change Password',
                           icon: Icons.password_outlined,
                           function: (){
-                            //TODO: CHANGE PASSWORD
+                            _firebaseAuth.sendPasswordResetEmail(
+                              email: _firebaseAuth.currentUser!.email.toString(),
+                            );
+
+                            floatingSnackBar('Password reset sent to email address');
                           },
                         ),
 
@@ -86,7 +97,8 @@ class _AppSettingsState extends State<AppSettings> {
                           label: 'Log Out',
                           icon: Icons.logout_outlined,
                           function: (){
-                            //TODO: LOG OUT
+                            _firebaseAuth.signOut();
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
                           },
                         ),
 
@@ -119,7 +131,9 @@ class _AppSettingsState extends State<AppSettings> {
                           label: 'Delete Account',
                           icon: Icons.delete_outlined,
                           function: (){
-                            //TODO: DELETE ACCOUNT
+                            //TODO: ALERT DIALOG
+                            _firebaseAuth.currentUser!.delete();
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
                           },
                         ),
                       ],

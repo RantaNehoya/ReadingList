@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:reading_list/utilities/widgets.dart';
 import 'package:reading_list/utilities/utilities.dart';
-import 'package:reading_list/app_theme.dart';
 
-import 'constants.dart';
 
 //edit book
 // class EditBook extends StatefulWidget {
@@ -424,16 +422,24 @@ class RemoveBook extends StatelessWidget {
 //add to favourites
 class AddToFavourites extends StatelessWidget {
 
-  final CollectionReference collectionReference;
   final AsyncSnapshot<QuerySnapshot> snapshot;
   final int index;
 
-  const AddToFavourites({
+  AddToFavourites({
     Key? key,
     required this.snapshot,
-    required this.collectionReference,
     required this.index,
   }) : super(key: key);
+
+  final CollectionReference _reference = FirebaseFirestore.instance.collection('users');
+
+  //firebase auth
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  //get user email
+  String _userEmail (){
+    return _firebaseAuth.currentUser!.email.toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -445,7 +451,7 @@ class AddToFavourites extends StatelessWidget {
         QueryDocumentSnapshot snapshotData = snapshot.data!.docs[index];
 
         //TODO: DUPLICATES
-        collectionReference.add({
+        _reference.doc(_userEmail()).collection('favourites').add({
           'image': snapshotData.get('image'),
           'title': snapshotData.get('title'),
           'author': snapshotData.get('author'),
@@ -469,16 +475,25 @@ class AddToFavourites extends StatelessWidget {
 //send to completed
 class SendToCompleted extends StatelessWidget {
 
-  final CollectionReference collectionReference;
+
   final AsyncSnapshot<QuerySnapshot> snapshot;
   final int index;
 
-  const SendToCompleted({
+  SendToCompleted({
     Key? key,
     required this.snapshot,
-    required this.collectionReference,
     required this.index,
   }) : super(key: key);
+
+  final CollectionReference _reference = FirebaseFirestore.instance.collection('users');
+
+  //firebase auth
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  //get user email
+  String _userEmail (){
+    return _firebaseAuth.currentUser!.email.toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -490,7 +505,7 @@ class SendToCompleted extends StatelessWidget {
         QueryDocumentSnapshot snapshotData = snapshot.data!.docs[index];
 
         //add to completed list
-        collectionReference.add({
+        _reference.doc(_userEmail()).collection('completed').add({
           'image': snapshotData.get('image'),
           'title': snapshotData.get('title'),
           'author': snapshotData.get('author'),

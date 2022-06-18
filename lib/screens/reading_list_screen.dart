@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:reading_list/models/book_layout.dart';
 import 'package:reading_list/utilities/alertbox_actions.dart';
@@ -17,9 +18,15 @@ class ReadingList extends StatefulWidget {
 class _ReadingListState extends State<ReadingList> {
 
   //collection reference
-  final _collectionReference = FirebaseFirestore.instance.collection('books');
-  final _favouritesCollectionReference = FirebaseFirestore.instance.collection('favourites');
-  final _completedCollectionReference = FirebaseFirestore.instance.collection('completed');
+  final _collectionReference = FirebaseFirestore.instance.collection('users');
+
+  //firebase auth
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  //get user email
+  String _userEmail (){
+    return _firebaseAuth.currentUser!.email.toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +39,7 @@ class _ReadingListState extends State<ReadingList> {
 
         //read from firebase
         body: StreamBuilder<QuerySnapshot>(
-          stream: _collectionReference.orderBy('title').snapshots(),
+          stream: _collectionReference.doc(_userEmail()).collection('books').orderBy('title').snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot){
 
             //error
@@ -104,14 +111,12 @@ class _ReadingListState extends State<ReadingList> {
 
                               //add to favourites
                               AddToFavourites(
-                                collectionReference: _favouritesCollectionReference,
                                 snapshot: snapshot,
                                 index: index,
                               ),
 
                               //send to completed
                               SendToCompleted(
-                                collectionReference: _completedCollectionReference,
                                 snapshot: snapshot,
                                 index: index,
                               ),

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:provider/provider.dart';
-
 //TODO: DATA PERSISTENCE
 class AppTheme {
 
@@ -27,9 +25,6 @@ class AppTheme {
     primaryColorLight: const Color(0xFFFFBC80),
     primaryColorDark: const Color(0xFFFF9F45),
     fontFamily: 'Dosis',
-    // buttonTheme: ButtonThemeData(
-    //
-    // ),
 
     iconTheme: const IconThemeData(
       color: Colors.black,
@@ -65,6 +60,12 @@ class AppTheme {
       floatingLabelStyle: const TextStyle(
         color: Colors.black54,
       ),
+
+      iconColor: Colors.white54,
+    ),
+
+    textSelectionTheme: const TextSelectionThemeData(
+      cursorColor: Colors.white54,
     ),
 
     // textButtonTheme: ,
@@ -130,6 +131,12 @@ class AppTheme {
       floatingLabelStyle: const TextStyle(
         color: Colors.white54,
       ),
+
+      iconColor: Colors.white54,
+    ),
+
+    textSelectionTheme: const TextSelectionThemeData(
+      cursorColor: Colors.white54,
     ),
 
     // textButtonTheme: ,

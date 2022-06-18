@@ -1,8 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart' as syspath;
@@ -25,7 +25,15 @@ class _AddBookState extends State<AddBook> {
   String _selectedImage = '';
 
   //collection reference
-  final _collectionReference = FirebaseFirestore.instance.collection('books');
+  final _collectionReference = FirebaseFirestore.instance.collection('users');
+
+  //firebase auth
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  //get user email
+  String _userEmail (){
+    return _firebaseAuth.currentUser!.email.toString();
+  }
 
   final _formKey = GlobalKey<FormState>();
   bool _isDateSelected = false;
@@ -68,7 +76,6 @@ class _AddBookState extends State<AddBook> {
     final appDir = await syspath.getApplicationDocumentsDirectory();
     final fileName = path.basename(imageFile!.path);
     final savedImage = await (File(imageFile.path)).copy('${appDir.path}/$fileName');
-    print('+++++++++++++++++++++++++++++++++++++++++++++${savedImage.path}');
 
     return savedImage.path;
   }
@@ -219,7 +226,7 @@ class _AddBookState extends State<AddBook> {
                           onPressed: (){
 
                             if(_formKey.currentState!.validate() && _isDateSelected){
-                              _collectionReference.add({
+                              _collectionReference.doc(_userEmail()).collection('books').add({
                                 'image': _selectedImage,
                                 'title': _title.text,
                                 'author': _author.text,

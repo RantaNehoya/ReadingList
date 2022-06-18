@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:reading_list/models/book_layout.dart';
 import 'package:reading_list/utilities/constants.dart';
@@ -16,7 +17,15 @@ class Favourites extends StatefulWidget {
 class _FavouritesState extends State<Favourites> {
 
   //collection reference
-  final _favouritesCollectionReference = FirebaseFirestore.instance.collection('favourites');
+  final _favouritesCollectionReference = FirebaseFirestore.instance.collection('users');
+
+  //firebase auth
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  //get user email
+  String _userEmail (){
+    return _firebaseAuth.currentUser!.email.toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +36,7 @@ class _FavouritesState extends State<Favourites> {
         ),
 
         body: StreamBuilder<QuerySnapshot>(
-          stream: _favouritesCollectionReference.orderBy('title').snapshots(),
+          stream: _favouritesCollectionReference.doc(_userEmail()).collection('favourites').orderBy('title').snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot){
 
             //error
