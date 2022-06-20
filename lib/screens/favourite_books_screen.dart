@@ -22,11 +22,6 @@ class _FavouritesState extends State<Favourites> {
   //firebase auth
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  //get user email
-  String _userEmail (){
-    return _firebaseAuth.currentUser!.email.toString();
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -36,7 +31,7 @@ class _FavouritesState extends State<Favourites> {
         ),
 
         body: StreamBuilder<QuerySnapshot>(
-          stream: _favouritesCollectionReference.doc(_userEmail()).collection('favourites').orderBy('title').snapshots(),
+          stream: _favouritesCollectionReference.doc(_firebaseAuth.currentUser!.uid).collection('favourites').orderBy('title').snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot){
 
             //error

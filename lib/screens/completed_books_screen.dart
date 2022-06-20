@@ -24,11 +24,6 @@ class _CompletedListState extends State<CompletedList> {
     //firebase auth
     final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-    //get user email
-    String _userEmail (){
-      return _firebaseAuth.currentUser!.email.toString();
-    }
-
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -36,7 +31,7 @@ class _CompletedListState extends State<CompletedList> {
         ),
 
         body: StreamBuilder<QuerySnapshot>(
-          stream: _completedCollectionReference.doc(_userEmail()).collection('completed').orderBy('title').snapshots(),
+          stream: _completedCollectionReference.doc(_firebaseAuth.currentUser!.uid).collection('completed').orderBy('title').snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
 
             //error

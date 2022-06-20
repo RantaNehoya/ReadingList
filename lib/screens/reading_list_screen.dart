@@ -23,11 +23,6 @@ class _ReadingListState extends State<ReadingList> {
   //firebase auth
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  //get user email
-  String _userEmail (){
-    return _firebaseAuth.currentUser!.email.toString();
-  }
-
   @override
   Widget build(BuildContext context) {
 
@@ -39,7 +34,7 @@ class _ReadingListState extends State<ReadingList> {
 
         //read from firebase
         body: StreamBuilder<QuerySnapshot>(
-          stream: _collectionReference.doc(_userEmail()).collection('books').orderBy('title').snapshots(),
+          stream: _collectionReference.doc(_firebaseAuth.currentUser!.uid).collection('books').orderBy('title').snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot){
 
             //error

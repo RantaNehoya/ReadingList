@@ -5,8 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:reading_list/app_theme.dart';
 import 'package:reading_list/utilities/widgets.dart';
-
-import 'login_screen.dart';
+import 'package:reading_list/screens/login_screen.dart';
 
 class AppSettings extends StatefulWidget {
   const AppSettings({Key? key}) : super(key: key);
@@ -16,6 +15,10 @@ class AppSettings extends StatefulWidget {
 }
 
 class _AppSettingsState extends State<AppSettings> {
+
+  String newEmail = '';
+
+  final _formKey = GlobalKey<FormState>();
 
   //firebase auth
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -38,26 +41,28 @@ class _AppSettingsState extends State<AppSettings> {
                   flex: 1,
                   child: Container(
                     width: double.infinity,
-                    color: theme.isDark ? AppTheme.darkMode.primaryColorDark : AppTheme.lightMode.primaryColorDark,
+                    color: theme.isDark ? AppTheme.darkMode.primaryColorLight : AppTheme.lightMode.primaryColorLight,
 
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.manage_accounts_outlined,
-                          size: MediaQuery.of(context).size.width * 0.4,
-                        ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.manage_accounts_outlined,
+                            size: MediaQuery.of(context).size.width * 0.4,
+                          ),
 
-                        Container(
-                          color: theme.isDark ? AppTheme.darkMode.primaryColorLight : AppTheme.lightMode.primaryColorLight,
+                          Container(
+                            color: theme.isDark ? AppTheme.darkMode.colorScheme.secondary : AppTheme.lightMode.colorScheme.secondary,
 
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Text(
-                              _firebaseAuth.currentUser!.email.toString(),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Text(
+                                _firebaseAuth.currentUser!.email.toString(),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -74,8 +79,55 @@ class _AppSettingsState extends State<AppSettings> {
                           label: 'Change Email',
                           icon: Icons.email_outlined,
                           function: (){
-                            //TODO: CHANGE EMAIL
-                            _firebaseAuth.currentUser!.updateEmail('newEmail');
+                            showDialog(
+                              context: context,
+                              builder: (context){
+                                return AlertDialog(
+                                  content: Form(
+                                    key: _formKey
+                                    ,
+                                    child: TextFormField(
+                                      decoration: const InputDecoration(
+                                        label: Text('New Email'),
+                                      ),
+
+                                      validator: (value){
+                                        if (value == null || value.isEmpty){
+                                          return 'Cannot leave field empty';
+                                        }
+                                        else {
+                                          return null;
+                                        }
+                                      },
+
+                                      onEditingComplete: (){
+                                        FocusManager.instance.primaryFocus?.unfocus();
+                                      },
+
+                                      onChanged: (value){
+                                        newEmail = value;
+                                      },
+                                    ),
+                                  ),
+
+                                  actions: [
+                                    TextButton(
+                                      onPressed: (){
+                                        //change email
+                                        if (_formKey.currentState!.validate()){
+                                          setState((){
+                                            _firebaseAuth.currentUser!.updateEmail(newEmail);
+                                          });
+                                          Navigator.pop(context);
+                                        }
+                                      },
+
+                                      child: const Text('Save'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
                           },
                         ),
 
@@ -98,7 +150,9 @@ class _AppSettingsState extends State<AppSettings> {
                           icon: Icons.logout_outlined,
                           function: (){
                             _firebaseAuth.signOut();
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+                            Navigator.popAndPushNamed(
+                              context, '/',
+                            );
                           },
                         ),
 
@@ -131,31 +185,47 @@ class _AppSettingsState extends State<AppSettings> {
                           label: 'Delete Account',
                           icon: Icons.delete_outlined,
                           function: (){
-                            //TODO: ALERT DIALOG
-                            _firebaseAuth.currentUser!.delete();
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+                            showDialog(
+                              context: context,
+                              builder: (context){
+                                return AlertDialog(
+                                  actionsAlignment: MainAxisAlignment.spaceAround,
+                                  content: const Text('Do you wish to delete your account?\nThis action is irreversible'),
+
+                                  actions: [
+                                    //yes
+                                    OutlinedButton(
+                                      onPressed: () async {
+
+                                        //delete user account
+                                        await _firebaseAuth.currentUser!.delete();
+
+                                        Navigator.popAndPushNamed(
+                                          context, '/',
+                                        );
+                                      },
+
+                                      child: const Text('Yes'),
+                                    ),
+
+                                    //no
+                                    OutlinedButton(
+                                      onPressed: (){
+                                        Navigator.pop(context);
+                                      },
+
+                                      child: const Text('No'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
                           },
                         ),
                       ],
                     ),
                   ),
                 ),
-                // Padding(
-                //   padding: const EdgeInsets.symmetric(
-                //     vertical: 8.0,
-                //   ),
-                //   child: ListView(
-                //     children: <Widget>[
-                //
-                //
-                //
-                //
-                //       GestureDetector(
-
-                //       ),
-                //     ],
-                //   ),
-                // ),
               ],
             ),
           );

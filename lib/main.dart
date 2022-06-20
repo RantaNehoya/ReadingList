@@ -24,11 +24,15 @@ class MyApp extends StatelessWidget {
       child: Consumer<ThemeProvider>(
         builder: (context, theme, _){
           return MaterialApp(
-              title: 'Reading List',
-              debugShowCheckedModeBanner: false,
-              theme: theme.isDark ? AppTheme.darkMode : AppTheme.lightMode,
+            title: 'Reading List',
+            debugShowCheckedModeBanner: false,
+            theme: theme.isDark ? AppTheme.darkMode : AppTheme.lightMode,
 
-              home: const LoginScreen()
+            initialRoute: '/',
+            routes: {
+              '/': (context) => const LoginScreen(),
+              '/navigator': (context) => const PageNavigation(),
+            },
           );
         },
       ),

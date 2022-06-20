@@ -6,8 +6,8 @@ class AppTheme {
   //light mode configuration
   static final lightMode = ThemeData(
     colorScheme: const ColorScheme(
-      primary: Color(0xFFF76E11),
-      secondary: Color(0xFFFC4F4F),
+      primary: Color(0xFF87805E),
+      secondary: Color(0xFFEDDFB3),
       background: Colors.white,
       brightness: Brightness.light,
 
@@ -21,9 +21,9 @@ class AppTheme {
       onSurface: Colors.black,
     ),
 
-    primaryColor: const Color(0xFFF76E11),
-    primaryColorLight: const Color(0xFFFFBC80),
-    primaryColorDark: const Color(0xFFFF9F45),
+    primaryColor: const Color(0xFF87805E),
+    primaryColorLight: const Color(0xFFD8CCA3),
+    primaryColorDark: const Color(0xFFB09B71),
     fontFamily: 'Dosis',
 
     iconTheme: const IconThemeData(
@@ -65,22 +65,20 @@ class AppTheme {
     ),
 
     textSelectionTheme: const TextSelectionThemeData(
-      cursorColor: Colors.white54,
+      cursorColor: Colors.black54,
     ),
-
-    // textButtonTheme: ,
   );
 
   //dark mode configuration
   static final darkMode = ThemeData(
     colorScheme: const ColorScheme(
-      primary: Color(0xFF461111),
-      secondary: Color(0xFFB3541E),
+      primary: Color(0xFF1C0A00),
+      secondary: Color(0xFFCC9544),
       background: Color(0xFF040303),
       brightness: Brightness.dark,
 
       error: Colors.red,
-      surface: Color(0xFFA13333),
+      surface: Color(0xFF361500),
 
       onBackground: Colors.white,
       onError: Colors.red,
@@ -89,13 +87,10 @@ class AppTheme {
       onSurface: Colors.white,
     ),
 
-    primaryColor: const Color(0xFFA13333),
-    primaryColorLight: const Color(0xFFA13333),
-    primaryColorDark: const Color(0xFF461111),
+    primaryColor: const Color(0xFF1C0A00),
+    primaryColorLight: const Color(0xFF603601),
+    primaryColorDark: const Color(0xFF361500),
     fontFamily: 'Dosis',
-    // buttonTheme: ButtonThemeData(
-    //
-    // ),
 
     iconTheme: const IconThemeData(
       color: Colors.white,
@@ -104,6 +99,7 @@ class AppTheme {
     appBarTheme: const AppBarTheme(
       centerTitle: true,
       foregroundColor: Colors.white,
+      backgroundColor: Color(0xFF1C0A00),
     ),
 
     bottomSheetTheme: const BottomSheetThemeData(
@@ -117,7 +113,7 @@ class AppTheme {
       ),
     ),
 
-    scaffoldBackgroundColor: Color(0xFF040303),
+    scaffoldBackgroundColor: const Color(0xFF040303),
 
     inputDecorationTheme: InputDecorationTheme(
       labelStyle: const TextStyle(
@@ -138,8 +134,6 @@ class AppTheme {
     textSelectionTheme: const TextSelectionThemeData(
       cursorColor: Colors.white54,
     ),
-
-    // textButtonTheme: ,
   );
 }
 
@@ -155,5 +149,4 @@ class ThemeProvider extends ChangeNotifier{
     _isDark = val;
     notifyListeners();
   }
-
 }

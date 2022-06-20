@@ -436,11 +436,6 @@ class AddToFavourites extends StatelessWidget {
   //firebase auth
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  //get user email
-  String _userEmail (){
-    return _firebaseAuth.currentUser!.email.toString();
-  }
-
   @override
   Widget build(BuildContext context) {
     return bookOption(
@@ -451,7 +446,7 @@ class AddToFavourites extends StatelessWidget {
         QueryDocumentSnapshot snapshotData = snapshot.data!.docs[index];
 
         //TODO: DUPLICATES
-        _reference.doc(_userEmail()).collection('favourites').add({
+        _reference.doc(_firebaseAuth.currentUser!.uid).collection('favourites').add({
           'image': snapshotData.get('image'),
           'title': snapshotData.get('title'),
           'author': snapshotData.get('author'),
@@ -490,11 +485,6 @@ class SendToCompleted extends StatelessWidget {
   //firebase auth
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  //get user email
-  String _userEmail (){
-    return _firebaseAuth.currentUser!.email.toString();
-  }
-
   @override
   Widget build(BuildContext context) {
     return bookOption(
@@ -505,7 +495,7 @@ class SendToCompleted extends StatelessWidget {
         QueryDocumentSnapshot snapshotData = snapshot.data!.docs[index];
 
         //add to completed list
-        _reference.doc(_userEmail()).collection('completed').add({
+        _reference.doc(_firebaseAuth.currentUser!.uid).collection('completed').add({
           'image': snapshotData.get('image'),
           'title': snapshotData.get('title'),
           'author': snapshotData.get('author'),

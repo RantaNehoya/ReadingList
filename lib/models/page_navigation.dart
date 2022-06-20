@@ -68,7 +68,7 @@ class _PageNavigation extends State<PageNavigation> {
               ],
               activeIndex: _index,
               gapLocation: GapLocation.center,
-              backgroundColor: theme.isDark ? AppTheme.darkMode.primaryColor : AppTheme.lightMode.primaryColor,
+              backgroundColor: theme.isDark ? AppTheme.darkMode.primaryColorDark : AppTheme.lightMode.primaryColor,
               activeColor: theme.isDark ? Colors.white : Colors.black,
               inactiveColor: theme.isDark ? Colors.white54 : Colors.black54,
               onTap: _onTapped,

@@ -30,11 +30,6 @@ class _AddBookState extends State<AddBook> {
   //firebase auth
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  //get user email
-  String _userEmail (){
-    return _firebaseAuth.currentUser!.email.toString();
-  }
-
   final _formKey = GlobalKey<FormState>();
   bool _isDateSelected = false;
   DateTime _selectedDate = DateTime.now();
@@ -226,7 +221,7 @@ class _AddBookState extends State<AddBook> {
                           onPressed: (){
 
                             if(_formKey.currentState!.validate() && _isDateSelected){
-                              _collectionReference.doc(_userEmail()).collection('books').add({
+                              _collectionReference.doc(_firebaseAuth.currentUser!.uid).collection('books').add({
                                 'image': _selectedImage,
                                 'title': _title.text,
                                 'author': _author.text,

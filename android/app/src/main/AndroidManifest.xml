@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nehoya.reading_list">
    <application
-        android:label="reading_list"
+        android:label="Reading List"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
