@@ -9,6 +9,8 @@ import 'package:reading_list/app_theme.dart';
 import 'package:reading_list/utilities/constants.dart';
 import 'package:reading_list/utilities/widgets.dart';
 
+import '../models/privacy_policy.dart';
+
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
 
@@ -56,7 +58,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       backgroundColor: AppTheme.lightMode.primaryColor,
 
       body: Column(
-        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
 
           //sign up
@@ -95,6 +96,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               authPageInput(
                                 label: 'Email',
                                 icon: Icons.email,
+                                inputType: TextInputType.emailAddress,
 
                                 controller: _emailController,
 
@@ -259,10 +261,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       on FirebaseAuthException catch (e){
                                         _isLoading = false;
 
-                                        if (e.code == 'email-already-exists'){
+                                        if (e.code == 'email-already-in-use'){
                                           ScaffoldMessenger.of(context).showSnackBar(
                                             floatingSnackBar(
-                                              'Email already exists',
+                                              'Email already in use',
                                             ),
                                           );
                                         }
@@ -283,7 +285,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         else if (e.code == 'invalid-password'){
                                           ScaffoldMessenger.of(context).showSnackBar(
                                             floatingSnackBar(
-                                              'Password must be 6 characters long',
+                                              'Password must be atleast 6 characters long',
                                             ),
                                           );
                                         }
@@ -323,7 +325,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           //view privacy policy
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(15.0),
 
               child: Container(
                 alignment: Alignment.bottomCenter,
@@ -346,7 +348,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                         recognizer: TapGestureRecognizer()
                           ..onTap = (){
-                            //TODO: LINK TO PRIVACY POLICY
+                            showDialog(
+                              context: context,
+                              builder: (context){
+                                return const PrivacyPolicy();
+                              },
+                            );
                           },
                       ),
                     ],

@@ -45,13 +45,13 @@ class _AppSettingsState extends State<AppSettings> {
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          // Padding(
-                          //   padding: const EdgeInsets.all(30.0),
-                          //   child: Image(
-                          //     image: const AssetImage('assets/images/img.png'),
-                          //     width: MediaQuery.of(context).size.width * 0.5,
-                          //   ),
-                          // ),
+                          Padding(
+                            padding: const EdgeInsets.all(30.0),
+                            child: Image(
+                              image: const AssetImage('assets/images/img.png'),
+                              width: MediaQuery.of(context).size.width * 0.5,
+                            ),
+                          ),
 
                           Container(
                             color: theme.isDark ? AppTheme.darkMode.colorScheme.secondary : AppTheme.lightMode.colorScheme.secondary,

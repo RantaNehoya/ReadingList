@@ -1,6 +1,6 @@
 # reading_list
 
-a database of all my books
+a single space to record all your books
 
 ## Getting Started
 

@@ -50,188 +50,190 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Padding(
           padding: const EdgeInsets.all(10.0),
 
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
 
-            children: [
-              const Text(
-                'Reading List',
-                style: kHeading,
-              ),
+              children: [
+                const Text(
+                  'Reading List',
+                  style: kHeading,
+                ),
 
-              kAuthPageSeparator,
+                kAuthPageSeparator,
 
-              const Text(
-                'A place to log all your reading books.\nWelcome back!',
-                textAlign: TextAlign.center,
-                style:kSubheading,
-              ),
+                const Text(
+                  'A place to log all your reading books.\nWelcome back!',
+                  textAlign: TextAlign.center,
+                  style:kSubheading,
+                ),
 
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
 
-                      //email
-                      authPageInput(
-                        label: 'Email',
-                        icon: Icons.email,
-                        inputType: TextInputType.emailAddress,
+                        //email
+                        authPageInput(
+                          label: 'Email',
+                          icon: Icons.email,
+                          inputType: TextInputType.emailAddress,
 
-                        controller: _emailController,
+                          controller: _emailController,
 
-                        function: (){
-                          _passwordFocusNode.requestFocus();
-                        },
-                      ),
-
-                      kAuthPageSeparator,
-
-                      //password
-                      authPageInput(
-                        label: 'Password',
-                        obscureTxt: _isObscured,
-                        icon: Icons.password_outlined,
-                        suffIcon: IconButton(
-
-                          icon: _isObscured ? const Icon(
-                            Icons.visibility_outlined,
-                          ) : const Icon(
-                            Icons.visibility_off_outlined,
-                          ),
-
-                          onPressed: (){
-                            setState(() {
-                              _isObscured = _isObscured ? false : true;
-                            });
+                          function: (){
+                            _passwordFocusNode.requestFocus();
                           },
                         ),
 
-                        controller: _passwordController,
-                        focusNode: _passwordFocusNode,
+                        kAuthPageSeparator,
 
-                        function: (){
-                          FocusManager.instance.primaryFocus?.unfocus();
-                        },
-                      ),
+                        //password
+                        authPageInput(
+                          label: 'Password',
+                          obscureTxt: _isObscured,
+                          icon: Icons.password_outlined,
+                          suffIcon: IconButton(
 
-                      kAuthPageSeparator,
-                      kAuthPageSeparator,
-                      kAuthPageSeparator,
+                            icon: _isObscured ? const Icon(
+                              Icons.visibility_outlined,
+                            ) : const Icon(
+                              Icons.visibility_off_outlined,
+                            ),
 
-                      RichText(
-                        text: TextSpan(
-                          text: 'Don\'t have an account? ',
-                          style: const TextStyle(
-                            fontFamily: 'Dosis',
+                            onPressed: (){
+                              setState(() {
+                                _isObscured = _isObscured ? false : true;
+                              });
+                            },
                           ),
 
-                          children: [
-                            TextSpan(
-                              text: 'Sign up',
-                              style: const TextStyle(
-                                fontFamily: 'Dosis',
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                              ),
+                          controller: _passwordController,
+                          focusNode: _passwordFocusNode,
 
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = (){
-                                  Navigator.popAndPushNamed(
-                                    context, '/',
-                                  );
-                                },
-                            ),
-                          ],
+                          function: (){
+                            FocusManager.instance.primaryFocus?.unfocus();
+                          },
                         ),
-                      ),
 
-                      kAuthPageSeparator,
+                        kAuthPageSeparator,
+                        kAuthPageSeparator,
+                        kAuthPageSeparator,
 
-                      ModalProgressHUD(
-                        inAsyncCall: _isLoading,
-                        child: OutlinedButton(
-                          child: const Text(
-                            'Log in',
-                            style: TextStyle(
-                              fontSize: 15.0,
+                        RichText(
+                          text: TextSpan(
+                            text: 'Don\'t have an account? ',
+                            style: const TextStyle(
+                              fontFamily: 'Dosis',
                             ),
-                          ),
 
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: MediaQuery.of(context).size.width * 0.2,
-                              vertical: MediaQuery.of(context).size.height * 0.02,
+                            children: [
+                              TextSpan(
+                                text: 'Sign up',
+                                style: const TextStyle(
+                                  fontFamily: 'Dosis',
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                ),
+
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = (){
+                                    Navigator.popAndPushNamed(
+                                      context, '/',
+                                    );
+                                  },
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        kAuthPageSeparator,
+
+                        ModalProgressHUD(
+                          inAsyncCall: _isLoading,
+                          child: OutlinedButton(
+                            child: const Text(
+                              'Log in',
+                              style: TextStyle(
+                                fontSize: 15.0,
+                              ),
                             ),
-                          ),
 
-                          onPressed: () async {
-                            _isLoading = true;
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: MediaQuery.of(context).size.width * 0.2,
+                                vertical: MediaQuery.of(context).size.height * 0.02,
+                              ),
+                            ),
 
-                            try {
+                            onPressed: () async {
+                              _isLoading = true;
 
-                              UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(
-                                email: _emailController.text,
-                                password: _passwordController.text,
-                              );
+                              try {
 
-                              User? user = userCredential.user;
+                                UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(
+                                  email: _emailController.text,
+                                  password: _passwordController.text,
+                                );
 
-                              if (user != null){
+                                User? user = userCredential.user;
+
+                                if (user != null){
+                                  _isLoading = false;
+
+                                  Navigator.popAndPushNamed(
+                                    context, '/navigator',
+                                  );
+                                }
+                              }
+
+                              on FirebaseAuthException catch (e){
                                 _isLoading = false;
 
-                                Navigator.popAndPushNamed(
-                                  context, '/navigator',
-                                );
+                                if (e.code == 'internal-error'){
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    floatingSnackBar(
+                                      'An error occurred',
+                                    ),
+                                  );
+                                }
+                                else if (e.code == 'wrong-password'){
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    floatingSnackBar(
+                                      'Incorrect password',
+                                    ),
+                                  );
+                                }
+                                else if (e.code == 'user-not-found'){
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    floatingSnackBar(
+                                      'User not found',
+                                    ),
+                                  );
+                                }
                               }
-                            }
 
-                            on FirebaseAuthException catch (e){
-                              _isLoading = false;
+                              on Exception {
+                                _isLoading = false;
 
-                              if (e.code == 'internal-error'){
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   floatingSnackBar(
                                     'An error occurred',
                                   ),
                                 );
                               }
-                              else if (e.code == 'wrong-password'){
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  floatingSnackBar(
-                                    'Incorrect password',
-                                  ),
-                                );
-                              }
-                              else if (e.code == 'user-not-found'){
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  floatingSnackBar(
-                                    'User not found',
-                                  ),
-                                );
-                              }
-                            }
-
-                            on Exception {
-                              _isLoading = false;
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                floatingSnackBar(
-                                  'An error occurred',
-                                ),
-                              );
-                            }
-                          },
+                            },
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
