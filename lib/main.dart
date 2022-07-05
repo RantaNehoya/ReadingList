@@ -5,7 +5,9 @@ import 'package:provider/provider.dart';
 
 import 'package:reading_list/app_theme.dart';
 import 'package:reading_list/models/page_navigation.dart';
+import 'package:reading_list/screens/loading_screen.dart';
 import 'package:reading_list/screens/login_screen.dart';
+import 'package:reading_list/screens/signup_screen.dart';
 
 
 void main() async {
@@ -30,7 +32,9 @@ class MyApp extends StatelessWidget {
 
             initialRoute: '/',
             routes: {
-              '/': (context) => const LoginScreen(),
+              '/': (context) => const LoadingScreen(),
+              '/signup': (context) => const SignUpScreen(),
+              '/login': (context) => const LoginScreen(),
               '/navigator': (context) => const PageNavigation(),
             },
           );

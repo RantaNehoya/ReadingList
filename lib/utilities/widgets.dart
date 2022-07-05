@@ -103,6 +103,38 @@ Padding bookInputTextFormField ({required String label, required TextEditingCont
   );
 }
 
+TextFormField authPageInput ({required TextEditingController controller, required String label, required IconData icon, required VoidCallback function, FocusNode? focusNode, IconButton? suffIcon, TextInputType? inputType, bool obscureTxt=false}){
+  return TextFormField(
+    controller: controller,
+    focusNode: focusNode,
+    obscureText: obscureTxt,
+    keyboardType: inputType,
+
+    decoration: InputDecoration(
+      labelText: label,
+
+      filled: true,
+      fillColor: AppTheme.lightMode.primaryColorLight,
+      floatingLabelBehavior: FloatingLabelBehavior.never,
+
+      prefixIcon: Icon(
+        icon,
+      ),
+
+      suffixIcon: suffIcon,
+    ),
+
+    validator: (value) {
+      if (value == null || value.isEmpty) {
+        return 'Cannot leave field empty';
+      }
+      return null;
+    },
+
+    onEditingComplete: function,
+  );
+}
+
 Padding settingsPageOptions ({required IconData icon, required String label, required VoidCallback function}){
   return Padding(
     padding: const EdgeInsets.all(8.0),

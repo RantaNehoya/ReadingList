@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:reading_list/app_theme.dart';
 import 'package:reading_list/utilities/widgets.dart';
-import 'package:reading_list/screens/login_screen.dart';
 
 class AppSettings extends StatefulWidget {
   const AppSettings({Key? key}) : super(key: key);
@@ -30,7 +29,7 @@ class _AppSettingsState extends State<AppSettings> {
         builder: (context, theme, _){
           return Scaffold(
             appBar: AppBar(
-              title: const Text("Change Theme"),
+              title: const Text('Settings'),
             ),
 
             body: Column(
@@ -46,10 +45,13 @@ class _AppSettingsState extends State<AppSettings> {
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          Icon(
-                            Icons.manage_accounts_outlined,
-                            size: MediaQuery.of(context).size.width * 0.4,
-                          ),
+                          // Padding(
+                          //   padding: const EdgeInsets.all(30.0),
+                          //   child: Image(
+                          //     image: const AssetImage('assets/images/img.png'),
+                          //     width: MediaQuery.of(context).size.width * 0.5,
+                          //   ),
+                          // ),
 
                           Container(
                             color: theme.isDark ? AppTheme.darkMode.colorScheme.secondary : AppTheme.lightMode.colorScheme.secondary,
