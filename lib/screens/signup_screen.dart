@@ -285,7 +285,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         else if (e.code == 'invalid-password'){
                                           ScaffoldMessenger.of(context).showSnackBar(
                                             floatingSnackBar(
-                                              'Password must be atleast 6 characters long',
+                                              'Password must be at least 6 characters long',
                                             ),
                                           );
                                         }
